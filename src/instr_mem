@@ -1,0 +1,33 @@
+module instr_mem (
+    input [31:0] addr,
+    output [31:0] instr
+);
+    reg [31:0] memory [0:255];
+
+    initial begin
+        // Expanded program with R-type, I-type, branches and jumps
+        memory[0] = 32'h00500093; // addi x1, x0, 5
+        memory[1] = 32'h00a00113; // addi x2, x0, 10
+        memory[2] = 32'h002081b3; // add x3, x1, x2
+        memory[3] = 32'h40328233; // sub x4, x5, x3 (x5 is 0)
+        memory[4] = 32'h0011a023; // sw x1, 0(x3)
+        memory[5] = 32'h0001a183; // lw x3, 0(x3)
+        memory[6] = 32'h0041c463; // beq x3, x4, +8
+        memory[7] = 32'h00000013; // nop (executed if branch not taken)
+        memory[8] = 32'h00000013; // nop
+        memory[9] = 32'h00000013; // nop
+        memory[10] = 32'h00000013; // nop
+        memory[11] = 32'h00000013; // nop
+        memory[12] = 32'h00000013; // nop (target of branch)
+        memory[13] = 32'h00000013; // nop
+        memory[14] = 32'h00000013; // nop
+        memory[15] = 32'h00000013; // nop
+        memory[16] = 32'h00000013; // nop
+        memory[17] = 32'h00000013; // nop
+        memory[18] = 32'h00000013; // nop
+        memory[19] = 32'h00000013; // nop
+        memory[20] = 32'h00000013; // nop
+    end
+
+    assign instr = memory[addr[9:2]];
+endmodule
