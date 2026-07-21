@@ -179,6 +179,22 @@ This verifies correct ALU functionality as per the control logic.
 
 The simulation confirms the correct execution of arithmetic and logical operations, control signal generation, register updates, and data flow through the processor pipeline.
 
+# ⚡ Power Analysis
+
+Power analysis was performed using **Xilinx Vivado** to estimate the total power consumption of the implemented processor design. The report includes dynamic power, static power, and on-chip resource power consumption, helping evaluate the energy efficiency of the process
+
+### 📍 Vivado Power Analysis report screenshot
+
+📷 <img width="1683" height="499" alt="image" src="https://github.com/user-attachments/assets/41dab127-2e01-401c-a5de-800ae89f5771" />
+
+# 📈 Resource Utilization
+
+Resource utilization analysis was carried out after synthesis and implementation in **Xilinx Vivado**. The report shows the FPGA resources used by the processor, including LUTs, Flip-Flops (FFs), I/O Pins, Block RAM (BRAM), and DSP resources.
+
+### 📍 Vivado Resource Utilization report screenshot 
+
+📷 <img width="1792" height="483" alt="image" src="https://github.com/user-attachments/assets/46f863ff-6d5b-4575-a08b-edacbe96f02b" />
+
 ## 🏆 Project Outcome
 
 - Successfully designed a 32-bit RISC-V RV32I Processor.
