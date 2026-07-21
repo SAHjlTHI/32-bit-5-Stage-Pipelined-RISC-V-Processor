@@ -222,6 +222,13 @@ Resource utilization analysis was carried out after synthesis and implementation
 - FPGA Hardware Implementation
 - Performance Optimization
 
+  # 📚 References
+
+1. RISC-V International. *The RISC-V Instruction Set Manual (RV32I).*
+2. Xilinx. *Vivado Design Suite User Guide.*
+3. Samir Palnitkar. *Verilog HDL: A Guide to Digital Design and Synthesis.*
+4. David A. Patterson and John L. Hennessy. *Computer Organization and Design: RISC-V Edition.*
+
 ## 👩‍💻 Author
 
 **K. Sahithi**
