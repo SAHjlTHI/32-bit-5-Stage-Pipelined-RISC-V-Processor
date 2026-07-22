@@ -16,3 +16,19 @@ module alu_8bit (
         endcase
     end
 endmodule
+
+module alu_control (
+    input [1:0] alu_op,
+    input [2:0] funct3,
+    input [6:0] funct7,
+    output reg [3:0] alu_ctrl
+);
+    always @(*) begin
+        case (alu_op)
+            2'b00: alu_ctrl = 4'b0010; // add for lw/sw/addi
+            2'b01: alu_ctrl = 4'b0110; // sub for beq
+            default: alu_ctrl = 4'b0000;
+        endcase
+    end
+endmodule
+
