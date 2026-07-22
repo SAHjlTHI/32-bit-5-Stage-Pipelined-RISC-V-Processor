@@ -1,0 +1,183 @@
+module tb_riscv_cpu;
+
+    // Clock & Reset
+    reg clk;
+    reg rst;
+
+    // Debug outputs from CPU
+    wire [31:0] dbg_reg_x1;
+    wire [31:0] dbg_reg_x2;
+    wire [31:0] dbg_reg_x3;
+    wire [31:0] dbg_reg_x4;
+
+    // ---------------- CPU DUT ----------------
+    riscv_cpu uut (
+        .clk(clk),
+        .rst(rst),
+        .dbg_reg_x1(dbg_reg_x1),
+        .dbg_reg_x2(dbg_reg_x2),
+        .dbg_reg_x3(dbg_reg_x3),
+        .dbg_reg_x4(dbg_reg_x4)
+    );
+
+    // ---------------- ALU TEST SIGNALS ----------------
+    reg  [7:0] alu_a, alu_b;
+    reg  [1:0] alu_op;
+    reg  [2:0] funct3;
+    reg  [6:0] funct7;
+    wire [3:0] alu_ctrl;
+    wire [7:0] alu_result;
+
+    // ALU Control (same as CPU)
+    alu_control alu_ctrl_tb (
+        .alu_op(alu_op),
+        .funct3(funct3),
+        .funct7(funct7),
+        .alu_ctrl(alu_ctrl)
+    );
+
+    // ALU
+    alu_8bit alu_tb (
+        .a(alu_a),
+        .b(alu_b),
+        .alu_ctrl(alu_ctrl),
+        .result(alu_result)
+    );
+
+    // ---------------- CLOCK GENERATION ----------------
+    always #5 clk = ~clk;
+
+    // ---------------- CPU TEST ----------------
+    initial begin
+        clk = 0;
+        rst = 1;
+
+        #20 rst = 0;
+        #300;
+
+        $display("=====================================");
+        $display("FINAL REGISTER VALUES");
+        $display("x1 = %d (0x%h)", dbg_reg_x1, dbg_reg_x1);
+        $display("x2 = %d (0x%h)", dbg_reg_x2, dbg_reg_x2);
+        $display("x3 = %d (0x%h)", dbg_reg_x3, dbg_reg_x3);
+        $display("x4 = %d (0x%h)", dbg_reg_x4, dbg_reg_x4);
+        $display("=====================================");
+
+        $stop;
+    end
+
+    // ---------------- ALU TESTS (USING ALU_CONTROL) ----------------
+    initial begin
+        #10;
+        $display("=========== ALU TESTS ===========");
+
+        // TEST 1: ADD (R-type ADD)
+        alu_a   = 8'd15;
+        alu_b   = 8'd10;
+        alu_op = 2'b10;
+        funct3 = 3'b000;
+        funct7 = 7'b0000000;
+        #10;
+        $display("ADD  : %d + %d = %d", alu_a, alu_b, alu_result);
+
+        // TEST 2: SUB (R-type SUB)
+        alu_a   = 8'd12;
+        alu_b   = 8'd5;
+        alu_op = 2'b10;
+        funct3 = 3'b000;
+        funct7 = 7'b0100000;
+        #10;
+        $display("SUB  : %d - %d = %d", alu_a, alu_b, alu_result);
+
+        // TEST 3: OR (R-type AND)
+        alu_a   = 8'd10;
+        alu_b   = 8'd10;
+        alu_op = 2'b10;
+        funct3 = 3'b110;
+        funct7 = 7'b0000000;
+        #10;
+        $display("OR  : %d & %d = %d", alu_a, alu_b, alu_result);
+        
+        // TEST 4: AND (R-type OR)
+        alu_a   = 8'd10;
+        alu_b   = 8'd5;
+        alu_op  = 2'b10;
+        funct3  = 3'b111;
+        funct7  = 7'b0000000;
+        #10;
+        $display("AND   : %d | %d = %d", alu_a, alu_b, alu_result);
+
+
+        $display("=================================");
+    end
+
+    // ---------------- LIVE MONITOR ----------------
+    initial begin
+        $monitor("TIME=%0t | x1=%0d x2=%0d x3=%0d x4=%0d",
+                 $time, dbg_reg_x1, dbg_reg_x2, dbg_reg_x3, dbg_reg_x4);
+    end
+
+endmodule
+
+
+/*
+module tb_riscv_cpu;
+
+    // Clock & Reset
+    reg clk;
+    reg rst;
+
+    // Debug outputs from CPU
+    wire [31:0] dbg_reg_x1;
+    wire [31:0] dbg_reg_x2;
+    wire [31:0] dbg_reg_x3;
+    wire [31:0] dbg_reg_x4;
+
+    // DUT instantiation
+    riscv_cpu uut (
+        .clk(clk),
+        .rst(rst),
+        .dbg_reg_x1(dbg_reg_x1),
+        .dbg_reg_x2(dbg_reg_x2),
+        .dbg_reg_x3(dbg_reg_x3),
+        .dbg_reg_x4(dbg_reg_x4)
+    );
+
+    // ---------------- CLOCK GENERATION ----------------
+    always #5 clk = ~clk;   // 10 ns clock (100 MHz)
+
+    // ---------------- TEST SEQUENCE ----------------
+    initial begin
+        // Initialize
+        clk = 0;
+        rst = 1;
+
+        // Hold reset for few cycles
+        #20;
+        rst = 0;
+
+        // Run simulation long enough for pipeline
+        #300;
+
+        // Final register values
+        $display("=====================================");
+        $display("FINAL REGISTER VALUES");
+        $display("x1 = %d (0x%h)", dbg_reg_x1, dbg_reg_x1);
+        $display("x2 = %d (0x%h)", dbg_reg_x2, dbg_reg_x2);
+        $display("x3 = %d (0x%h)", dbg_reg_x3, dbg_reg_x3);
+        $display("x4 = %d (0x%h)", dbg_reg_x4, dbg_reg_x4);
+        $display("=====================================");
+
+        $stop;
+    end
+
+    // ---------------- LIVE MONITOR ----------------
+    initial begin
+        $monitor("TIME=%0t | x1=%0d x2=%0d x3=%0d x4=%0d",
+                 $time, dbg_reg_x1, dbg_reg_x2, dbg_reg_x3, dbg_reg_x4);
+    end
+
+endmodule
+
+*/
+
